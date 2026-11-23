@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+.terraformrc
+terraform.rc
+# keep the lock file committed; never commit real tfvars with secrets
+secrets.auto.tfvars
+.env
