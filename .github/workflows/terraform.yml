@@ -1,0 +1,34 @@
+name: Terraform
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [environments/dev, environments/prod, bootstrap]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5
+      - name: Format check
+        run: terraform fmt -check -recursive
+      - name: Init (no backend)
+        run: terraform -chdir=${{ matrix.dir }} init -backend=false -input=false
+      - name: Validate
+        run: terraform -chdir=${{ matrix.dir }} validate
+
+  tflint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: tflint --recursive --config "$GITHUB_WORKSPACE/.tflint.hcl"
